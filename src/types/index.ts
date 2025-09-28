@@ -5,6 +5,10 @@ export interface Candidate {
   name?: string;
   email?: string;
   phone?: string;
+  skills?: string[];
+  experience?: string[];
+  yearsOfExperience?: number;
+  role?: string;
   createdAt: string;
   progress: 'not_started' | 'in_progress' | 'completed';
   score?: number; // final
@@ -39,6 +43,11 @@ export interface ResumeData {
     phone?: string;
     skills?: string[];
     experience?: string[];
+    education?: string[];
+    summary?: string;
+    yearsOfExperience?: number;
+    technologies?: string[];
+    projects?: string[];
   };
 }
 

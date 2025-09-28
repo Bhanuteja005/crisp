@@ -1,14 +1,146 @@
-# Crisp Interview - AI-Powered Technical Assessment Platform# 🚀 Crisp Interview - AI-Powered Technical Assessment Platform
-
-
-
-## Overview
-
-## 📖 Overview
+# Crisp Interview - AI-Powered Technical Assessment Platform
 
 A React-based technical interview platform that automates the interview process using Google Gemini AI. The system provides dual interfaces for interviewees and interviewers with intelligent question generation, automated scoring, and comprehensive evaluation.
 
-Crisp Interview is a cutting-edge AI-powered technical assessment platform that streamlines the interview process with intelligent automation. Built with React and powered by Google's Gemini AI, it provides real-time question generation, automated scoring, and comprehensive candidate evaluation.
+## Architecture
+
+### Tech Stack
+- Frontend: React 19 with TypeScript
+- Build Tool: Vite
+- State Management: Redux Toolkit with Redux Persist
+- Routing: React Router DOM v7
+- AI Integration: Google Gemini 2.0 Flash
+- Styling: Tailwind CSS with Framer Motion
+- Resume Processing: PDF.js and Mammoth.js
+
+### Project Structure
+```
+src/
+├── api/                    # External API integrations
+│   └── geminiService.ts    # Google Gemini AI service
+├── app/                    # Redux store configuration
+│   ├── store.ts            # Store setup with persistence
+│   └── uiSlice.ts         # UI state management
+├── components/             # Reusable UI components
+│   ├── global/            # App-wide components
+│   ├── onboarding/        # Landing page components
+│   └── ui/                # Base UI components
+├── constants/             # Application constants
+├── features/              # Feature-based modules
+│   ├── interviewee/       # Candidate interview logic
+│   └── interviewer/       # Interviewer dashboard logic
+├── functions/             # Utility functions
+├── hooks/                 # Custom React hooks
+├── types/                 # TypeScript type definitions
+└── utils/                 # Utility modules
+    └── resumeParser.ts    # Resume parsing logic
+```
+
+## Core Features
+
+### AI-Powered Intelligence
+- Dynamic Question Generation: Uses Gemini 2.5 Pro to create relevant, contextual questions
+- Intelligent Scoring: AI evaluates answers with detailed feedback and reasoning
+- Smart Summaries: Generates comprehensive candidate assessments automatically
+- Personalized Questions: Tailors questions based on candidate skills and experience
+
+### Interview Management
+- Dual Interface: Synchronized Interviewee and Interviewer views
+- Real-time Timers: Question-specific time limits with visual indicators
+- Resume Parsing: Automatic extraction of contact info, skills, and experience
+- Progress Tracking: Complete interview state management
+
+### Resume Processing
+- PDF and DOCX Support: Extracts text from uploaded resume files
+- Smart Field Detection: Automatically identifies name, email, phone, skills, and experience
+- Missing Field Recovery: Prompts for missing information before interview start
+- Experience Analysis: Calculates years of experience and identifies technical skills
+
+## Data Flow
+
+### Resume Upload Flow
+1. User uploads PDF/DOCX file
+2. File processed using PDF.js or Mammoth.js to extract text
+3. ResumeParser analyzes text using regex patterns and heuristics
+4. Extracted data populates candidate profile (name, email, phone, skills, experience)
+5. Missing fields identified and user prompted to complete information
+6. Profile data used to personalize interview questions
+
+### Interview Flow
+1. Candidate completes profile information
+2. AI generates personalized questions based on skills and experience level
+3. Questions presented with appropriate time limits (easy: 20s, medium: 60s, hard: 120s)
+4. Answers submitted and scored by AI with detailed feedback
+5. Progress tracked through 6 questions of varying difficulty
+6. Final summary generated with strengths and improvement areas
+
+### State Management
+- Redux Toolkit manages application state
+- Redux Persist maintains data across browser sessions
+- Separate slices for interview state and UI state
+- Real-time synchronization between interviewee and interviewer views
+
+## AI Integration
+
+### Question Generation
+- Contextual questions based on candidate profile
+- Difficulty progression: 2 easy, 2 medium, 2 hard
+- Avoids repetition with previous question tracking
+- Role-specific content (Frontend, Backend, Full Stack)
+
+### Scoring System
+- AI evaluates technical accuracy and communication clarity
+- Provides constructive feedback with specific suggestions
+- Considers candidate experience level in evaluation
+- Fallback scoring system for offline scenarios
+
+### Summary Generation
+- Comprehensive performance analysis
+- Identifies specific strengths and improvement areas
+- Professional, constructive feedback format
+- Export-ready format for hiring decisions
+
+## Configuration
+
+### Environment Variables
+```
+VITE_GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+### Build and Development
+```bash
+npm install        # Install dependencies
+npm run dev        # Start development server
+npm run build      # Build for production
+npm run preview    # Preview production build
+```
+
+## Technical Implementation
+
+### Resume Parser
+- Multi-format support (PDF, DOCX)
+- Advanced text extraction with fallback mechanisms
+- Pattern-based field identification
+- Skills matching against comprehensive technology database
+- Experience calculation from employment dates
+
+### Timer System
+- Precise countdown with visual indicators
+- Auto-submission on timeout
+- Pause/resume functionality
+- Question-specific time limits
+
+### Data Persistence
+- Redux Persist maintains interview state
+- LocalStorage for candidate data
+- Session recovery after browser refresh
+- Cross-tab synchronization
+
+## Performance Considerations
+- Code splitting with manual chunks
+- Lazy loading of heavy components
+- Optimized asset loading
+- Memory-efficient file processing
 
 ## Architecture
 

@@ -42,10 +42,19 @@ export const generateNextQuestion = createAsyncThunk(
     
     const previousQuestions = candidate.questions.map(q => q.text);
     
+    // Create candidate profile for personalized questions
+    const candidateProfile = {
+      skills: candidate.skills || candidate.resumeData?.parsedFields.skills || [],
+      experience: candidate.experience || candidate.resumeData?.parsedFields.experience || [],
+      yearsOfExperience: candidate.yearsOfExperience || candidate.resumeData?.parsedFields.yearsOfExperience,
+      role: candidate.role || 'Full Stack Developer'
+    };
+    
     const questionText = await geminiService.generateQuestion({
       difficulty,
-      role: 'Full Stack Developer',
+      role: candidateProfile.role,
       previousQuestions,
+      candidateProfile,
     });
 
     const timerSeconds = difficulty === 'easy' ? 20 : difficulty === 'medium' ? 60 : 120;
@@ -155,46 +164,96 @@ const interviewSlice = createSlice({
     setResumeData: (state, action: PayloadAction<ResumeData>) => {
       if (state.currentCandidate) {
         state.currentCandidate.resumeData = action.payload;
-        const { name, email, phone } = action.payload.parsedFields;
+        const { name, email, phone, skills, experience, yearsOfExperience } = action.payload.parsedFields;
         
-        // Update fields only if they're not already set or if resume data is better
+        const fieldsUpdated: string[] = [];
+        
+        // Update contact fields only if they're not already set or are empty
         if (name && name.trim() && (!state.currentCandidate.name || state.currentCandidate.name.trim() === '')) {
           state.currentCandidate.name = name;
           state.missingFields = state.missingFields.filter(f => f !== 'name');
+          fieldsUpdated.push('name');
         }
         if (email && email.trim() && (!state.currentCandidate.email || state.currentCandidate.email.trim() === '')) {
           state.currentCandidate.email = email;
           state.missingFields = state.missingFields.filter(f => f !== 'email');
+          fieldsUpdated.push('email');
         }
         if (phone && phone.trim() && (!state.currentCandidate.phone || state.currentCandidate.phone.trim() === '')) {
           state.currentCandidate.phone = phone;
           state.missingFields = state.missingFields.filter(f => f !== 'phone');
+          fieldsUpdated.push('phone');
         }
 
-        // Only check for fields that are still missing
+        // Always update skills and experience data
+        if (skills && skills.length > 0) {
+          state.currentCandidate.skills = skills;
+        }
+        if (experience && experience.length > 0) {
+          state.currentCandidate.experience = experience;
+        }
+        if (yearsOfExperience !== undefined) {
+          state.currentCandidate.yearsOfExperience = yearsOfExperience;
+        }
+
+        // Determine candidate's role based on skills
+        if (skills && skills.length > 0) {
+          const frontendSkills = ['React', 'Vue', 'Angular', 'JavaScript', 'TypeScript', 'HTML', 'CSS'];
+          const backendSkills = ['Node.js', 'Python', 'Java', 'Express', 'Django', 'Spring'];
+          
+          const hasFrontend = skills.some(skill => frontendSkills.includes(skill));
+          const hasBackend = skills.some(skill => backendSkills.includes(skill));
+          
+          if (hasFrontend && hasBackend) {
+            state.currentCandidate.role = 'Full Stack Developer';
+          } else if (hasFrontend) {
+            state.currentCandidate.role = 'Frontend Developer';
+          } else if (hasBackend) {
+            state.currentCandidate.role = 'Backend Developer';
+          } else {
+            state.currentCandidate.role = 'Software Developer';
+          }
+        }
+
+        // Check for remaining missing fields
         const stillMissing = [];
         if (!state.currentCandidate.name || state.currentCandidate.name.trim() === '') stillMissing.push('name');
         if (!state.currentCandidate.email || state.currentCandidate.email.trim() === '') stillMissing.push('email');
         if (!state.currentCandidate.phone || state.currentCandidate.phone.trim() === '') stillMissing.push('phone');
         
-        // Only update missing fields, don't override the array completely
-        const previousMissingCount = state.missingFields.length;
         state.missingFields = stillMissing;
         
-        // Add encouraging message if some fields were filled from resume
-        const fieldsUpdated = [];
-        if (name && name.trim() && (!state.currentCandidate.name || previousMissingCount > stillMissing.length)) fieldsUpdated.push('name');
-        if (email && email.trim() && (!state.currentCandidate.email || previousMissingCount > stillMissing.length)) fieldsUpdated.push('email');
-        if (phone && phone.trim() && (!state.currentCandidate.phone || previousMissingCount > stillMissing.length)) fieldsUpdated.push('phone');
-        
-        if (fieldsUpdated.length > 0) {
+        // Add encouraging message based on what was extracted
+        if (fieldsUpdated.length > 0 || skills?.length || experience?.length) {
           const fieldNames = { name: 'name', email: 'email address', phone: 'phone number' };
-          const updatedText = fieldsUpdated.map(f => fieldNames[f as keyof typeof fieldNames]).join(', ');
+          let message = 'Great! I analyzed your resume and found: ';
+          
+          const parts = [];
+          if (fieldsUpdated.length > 0) {
+            parts.push(`your ${fieldsUpdated.map(f => fieldNames[f as keyof typeof fieldNames]).join(', ')}`);
+          }
+          if (skills && skills.length > 0) {
+            parts.push(`${skills.length} technical skills (${skills.slice(0, 3).join(', ')}${skills.length > 3 ? ', ...' : ''})`);
+          }
+          if (experience && experience.length > 0) {
+            parts.push(`work experience details`);
+          }
+          if (yearsOfExperience) {
+            parts.push(`${yearsOfExperience} years of experience`);
+          }
+          
+          message += parts.join(', ') + '. ';
+          
+          if (stillMissing.length === 0) {
+            message += `Perfect! All required information is complete. I've identified you as a ${state.currentCandidate.role || 'Software Developer'}. You can now begin your personalized interview!`;
+          } else {
+            message += `Still need: ${stillMissing.map(f => fieldNames[f as keyof typeof fieldNames]).join(', ')}.`;
+          }
           
           state.chatMessages.push({
             id: `msg_${Date.now()}`,
             type: 'system',
-            content: `Great! I found your ${updatedText} from your resume. ${stillMissing.length === 0 ? "All information is now complete! You can begin the interview." : `Still need: ${stillMissing.map(f => fieldNames[f as keyof typeof fieldNames]).join(', ')}.`}`,
+            content: message,
             timestamp: new Date().toISOString(),
           });
         }
@@ -301,22 +360,55 @@ const interviewSlice = createSlice({
     },
 
     clearCurrentInterview: (state) => {
-      // Preserve resume data when clearing interview
+      // Preserve resume data and contact info when clearing interview
       const preservedResumeData = state.currentCandidate?.resumeData;
       const preservedName = state.currentCandidate?.name;
       const preservedEmail = state.currentCandidate?.email;
       const preservedPhone = state.currentCandidate?.phone;
+      const preservedSkills = state.currentCandidate?.skills;
+      const preservedExperience = state.currentCandidate?.experience;
+      const preservedYearsOfExperience = state.currentCandidate?.yearsOfExperience;
+      const preservedRole = state.currentCandidate?.role;
       
-      return {
-        ...initialState,
-        currentCandidate: preservedName || preservedEmail || preservedPhone || preservedResumeData ? {
-          ...initialState.currentCandidate!,
+      // Reset state but preserve essential data
+      state.currentCandidate = null;
+      state.chatMessages = [];
+      state.timerState = {
+        isActive: false,
+        timeLeft: 0,
+        totalTime: 0,
+      };
+      state.isInterviewActive = false;
+      state.missingFields = [];
+      state.isGeneratingQuestion = false;
+      state.isSubmittingAnswer = false;
+      
+      // If we have preserved data, create a new candidate with it
+      if (preservedName || preservedEmail || preservedPhone || preservedResumeData) {
+        state.currentCandidate = {
+          id: `candidate_${Date.now()}`,
           name: preservedName || '',
           email: preservedEmail || '',
           phone: preservedPhone || '',
+          skills: preservedSkills || [],
+          experience: preservedExperience || [],
+          yearsOfExperience: preservedYearsOfExperience,
+          role: preservedRole,
+          createdAt: new Date().toISOString(),
+          progress: 'not_started',
+          questions: [],
+          currentQuestionIndex: 0,
           resumeData: preservedResumeData,
-        } : null,
-      };
+        };
+        
+        // Check for missing fields immediately
+        const missing = [];
+        if (!preservedName || preservedName.trim() === '') missing.push('name');
+        if (!preservedEmail || preservedEmail.trim() === '') missing.push('email');
+        if (!preservedPhone || preservedPhone.trim() === '') missing.push('phone');
+        
+        state.missingFields = missing;
+      }
     },
   },
   extraReducers: (builder) => {

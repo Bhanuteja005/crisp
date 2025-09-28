@@ -22,22 +22,53 @@ export class GeminiService {
     }
   }
 
-  async generateQuestion(request: QuestionGenerationRequest): Promise<string> {
+  async generateQuestion(request: QuestionGenerationRequest & { 
+    candidateProfile?: {
+      skills?: string[];
+      experience?: string[];
+      yearsOfExperience?: number;
+      role?: string;
+    }
+  }): Promise<string> {
+    const { candidateProfile } = request;
+    const profileInfo = candidateProfile ? `
+
+CANDIDATE PROFILE:
+- Role: ${candidateProfile.role || request.role}
+- Skills: ${candidateProfile.skills?.join(', ') || 'Not specified'}
+- Years of Experience: ${candidateProfile.yearsOfExperience || 'Not specified'}
+- Experience: ${candidateProfile.experience?.slice(0, 2).join('; ') || 'Not specified'}
+
+INSTRUCTIONS:
+- Tailor the question to their specific skills and experience level
+- If they have React experience, ask React-specific questions
+- If they're experienced (3+ years), make questions more advanced
+- If they're junior (0-2 years), focus on fundamentals
+- Use their actual skills to create relevant scenarios` : '';
+
+    const timingGuide = {
+      easy: '20 seconds - Basic concepts, definitions, or simple comparisons',
+      medium: '60 seconds - Practical scenarios, problem-solving, or explanations with examples',  
+      hard: '120 seconds - Complex system design, detailed analysis, or multi-part problems'
+    };
+
     const prompt = `
-Generate a single interview question for a ${request.role} position.
+Generate a single technical interview question for a ${request.role} position.
 
-Difficulty: ${request.difficulty.toUpperCase()}
+Difficulty: ${request.difficulty.toUpperCase()} (${timingGuide[request.difficulty]})
+${profileInfo}
 
-Requirements:
-- Make it engaging and relevant to ${request.role}
-- Should test practical knowledge and problem-solving
+REQUIREMENTS:
+- Make it engaging and directly relevant to their background
+- Test practical knowledge and real-world application
 - Avoid questions similar to: ${request.previousQuestions?.join(", ") || "none"}
-- Return ONLY the question text, no additional formatting
+- Return ONLY the question text, no additional formatting or explanations
+- Ensure the question can be reasonably answered in the time limit
 
-Difficulty specifications:
-- easy: 20 seconds to answer. Should be basic conceptual questions.
-- medium: 60 seconds to answer. Should require some explanation or problem-solving.
-- hard: 120 seconds to answer. Should be complex, requiring detailed analysis or coding knowledge.
+EXAMPLES BY DIFFICULTY:
+Easy: "What's the difference between var, let, and const in JavaScript?"
+Medium: "How would you handle state management in a React application with multiple components sharing data?"
+Hard: "Design a scalable system architecture for a real-time chat application that supports 100,000+ concurrent users."
     `;
 
     try {
@@ -46,7 +77,7 @@ Difficulty specifications:
       return response.text().trim();
     } catch (error: any) {
       console.error("Error generating question:", error);
-      return `🤖 [Offline Mode] ${this.getFallbackQuestion(request.difficulty)}`;
+      return `🤖 [Offline Mode] ${this.getFallbackQuestion(request.difficulty, candidateProfile?.skills)}`;
     }
   }
 
@@ -117,30 +148,47 @@ Respond in this exact JSON format:
       : 0;
 
     const questionSummary = answeredQuestions.map(q => 
-      `Q: ${q.text}\nA: ${q.answer}\nScore: ${q.score || 0}/100`
+      `Q: ${q.text}\nA: ${q.answer}\nScore: ${q.score || 0}/100\nFeedback: ${q.feedback || 'N/A'}`
     ).join('\n\n');
 
-    const prompt = `
-Generate a comprehensive interview summary for candidate: ${candidate.name || 'Anonymous'}
+    const candidateProfile = `
+CANDIDATE PROFILE:
+- Name: ${candidate.name || 'Anonymous'}
+- Role: ${candidate.role || 'Software Developer'}
+- Skills: ${candidate.skills?.join(', ') || 'Not specified'}
+- Years of Experience: ${candidate.yearsOfExperience || 'Not specified'}
+- Resume Experience: ${candidate.experience?.slice(0, 2).join('; ') || 'Not specified'}
+`;
 
-Interview Performance:
+    const prompt = `
+Generate a comprehensive interview summary for this candidate:
+
+${candidateProfile}
+
+INTERVIEW PERFORMANCE:
 ${questionSummary}
 
-Overall Statistics:
+STATISTICS:
 - Questions Answered: ${answeredQuestions.length}/6
 - Average Score: ${avgScore.toFixed(1)}/100
 - Started: ${candidate.startedAt ? new Date(candidate.startedAt).toLocaleString() : 'N/A'}
 - Status: ${candidate.progress}
+- Interview Duration: ${candidate.startedAt && candidate.completedAt ? 
+  Math.round((new Date(candidate.completedAt).getTime() - new Date(candidate.startedAt).getTime()) / 60000) + ' minutes' : 'N/A'}
 
-Provide a professional evaluation in this exact JSON format:
+INSTRUCTIONS:
+- Consider their background and experience level when evaluating performance
+- Provide specific, actionable feedback
+- Be professional but encouraging
+- Consider if questions matched their skill level appropriately
+
+Respond in this exact JSON format:
 {
-  "summary": "[3-4 sentences summarizing overall performance and key insights]",
-  "overallScore": [number 0-100 based on performance],
-  "strengths": ["strength1", "strength2", "strength3"],
-  "improvements": ["area1", "area2", "area3"]
+  "summary": "[3-4 sentences summarizing overall performance, considering their background and experience level]",
+  "overallScore": [number 0-100 - be fair but consider experience level],
+  "strengths": ["specific strength 1", "specific strength 2", "specific strength 3"],
+  "improvements": ["specific improvement area 1", "specific improvement area 2", "specific improvement area 3"]
 }
-
-Be professional, constructive, and fair in your assessment.
     `;
 
     try {
@@ -166,7 +214,36 @@ Be professional, constructive, and fair in your assessment.
     }
   }
 
-  private getFallbackQuestion(difficulty: Difficulty): string {
+  private getFallbackQuestion(difficulty: Difficulty, skills?: string[]): string {
+    // Skill-specific questions if we have skills info
+    if (skills && skills.length > 0) {
+      const hasReact = skills.some(s => s.toLowerCase().includes('react'));
+      const hasNode = skills.some(s => s.toLowerCase().includes('node'));
+      const hasPython = skills.some(s => s.toLowerCase().includes('python'));
+
+      const skillBasedQuestions = {
+        easy: [
+          hasReact ? "What are React hooks and why were they introduced?" : "What is the difference between let, const, and var in JavaScript?",
+          hasNode ? "What is the event loop in Node.js?" : "Explain what a REST API is.",
+          hasPython ? "What's the difference between a list and a tuple in Python?" : "What is the purpose of CSS?"
+        ],
+        medium: [
+          hasReact ? "How would you optimize a React component that re-renders frequently?" : "Describe how you would implement state management in a web application.",
+          hasNode ? "How would you handle file uploads in a Node.js application?" : "Explain the difference between SQL and NoSQL databases.",
+          hasPython ? "How would you implement a REST API using Flask or Django?" : "What are some common security vulnerabilities in web applications?"
+        ],
+        hard: [
+          hasReact ? "Design a React application architecture for a large-scale e-commerce platform with complex state management needs." : "Design a system to handle real-time notifications for millions of users.",
+          hasNode ? "How would you design a scalable Node.js microservices architecture for a social media platform?" : "Explain how you would implement authentication in a distributed system.",
+          hasPython ? "Design a machine learning pipeline for real-time fraud detection using Python." : "Describe how you would optimize a slow-performing database query."
+        ]
+      };
+
+      const questions = skillBasedQuestions[difficulty];
+      return questions[Math.floor(Math.random() * questions.length)];
+    }
+
+    // Default fallback questions
     const fallbackQuestions = {
       easy: [
         "What is the difference between let, const, and var in JavaScript?",
