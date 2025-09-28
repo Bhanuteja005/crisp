@@ -1,12 +1,5 @@
 # 🚀 Crisp Interview - AI-Powered Technical Assessment Platform
 
-<div align="center">
-  <img src="https://img.shields.io/badge/React-19+-blue.svg" alt="React">
-  <img src="https://img.shields.io/badge/TypeScript-5+-blue.svg" alt="TypeScript">
-  <img src="https://img.shields.io/badge/Tailwind-3+-blue.svg" alt="Tailwind">
-  <img src="https://img.shields.io/badge/Gemini-AI-green.svg" alt="Gemini AI">
-  <img src="https://img.shields.io/badge/Redux-Toolkit-purple.svg" alt="Redux">
-</div>
 
 ## 📖 Overview
 

@@ -1,10 +1,5 @@
-"use client";
-
-import React, { useCallback, useEffect } from "react";
-import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
+import React from "react";
 import { Particles } from "../ui/particles";
-
-import { cn } from "../../functions/cn";
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
     children: React.ReactNode;

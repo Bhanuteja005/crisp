@@ -1,4 +1,4 @@
-import React from "react";
+// React import not needed
 import { cn } from "../../functions/cn";
 
 type SpotlightProps = {

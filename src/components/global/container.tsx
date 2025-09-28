@@ -18,7 +18,7 @@ const Container = ({ children, className, delay = 0.2, reverse, simple }: Props)
             initial={{ opacity: 0, y: reverse ? -20 : 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false }}
-            transition={{ delay: delay, duration: simple ? 0.2 : 0.4, type: simple ? "keyframes" : "spring", stiffness: simple && 100 }}
+            transition={{ delay: delay, duration: simple ? 0.2 : 0.4, type: simple ? "keyframes" : "spring", stiffness: simple ? 100 : undefined }}
         >
             {children}
         </motion.div>

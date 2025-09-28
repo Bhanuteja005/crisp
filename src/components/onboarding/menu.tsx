@@ -34,10 +34,10 @@ const Menu = () => {
                                     >
                                         <Icons.icon className="w-6 h-6" />
                                         <div className="my-2 text-lg font-normal">
-                                            Luro AI
+                                            Crisp AI
                                         </div>
                                         <p className="text-sm text-black">
-                                            Your ultimate social media management tool
+                                            Your ultimate AI Interview Assistant
                                         </p>
                                     </Link>
                                 </NavigationMenuLink>

@@ -20,7 +20,7 @@ export const Timer: React.FC<TimerProps> = ({
   className = '',
 }) => {
   useEffect(() => {
-    let interval: number | null = null;
+    let interval: NodeJS.Timeout | null = null;
 
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => {

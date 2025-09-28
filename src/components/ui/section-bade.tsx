@@ -1,4 +1,4 @@
-import React from 'react'
+// React import not needed
 
 interface Props {
     title: string;

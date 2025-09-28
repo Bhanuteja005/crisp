@@ -1,7 +1,7 @@
 import { cn } from "./cn";
-import { generateMetadata } from "./metadata";
+import { APP_METADATA } from "./metadata";
 
 export {
     cn,
-    generateMetadata,
+    APP_METADATA,
 };

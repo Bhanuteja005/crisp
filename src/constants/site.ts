@@ -1,8 +1,8 @@
-export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Swipe AI';
+export const APP_NAME = import.meta.env.VITE_APP_NAME || 'Crisp Interview';
 
-export const APP_DOMAIN = `https://${process.env.NEXT_PUBLIC_APP_DOMAIN || 'localhost:3000'}`;
+export const APP_DOMAIN = `https://${import.meta.env.VITE_APP_DOMAIN || 'localhost:5173'}`;
 
 export const APP_HOSTNAMES = new Set([
-    process.env.NEXT_PUBLIC_APP_DOMAIN || 'localhost:3000',
-    `www.${process.env.NEXT_PUBLIC_APP_DOMAIN || 'localhost:3000'}`,
+    import.meta.env.VITE_APP_DOMAIN || 'localhost:5173',
+    `www.${import.meta.env.VITE_APP_DOMAIN || 'localhost:5173'}`,
 ]);

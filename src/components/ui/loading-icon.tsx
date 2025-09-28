@@ -1,5 +1,5 @@
 import { cn } from "../../functions/cn";
-import React from 'react';
+// React import not needed for this component
 
 interface Props {
     size?: "sm" | "md" | "lg";
