@@ -37,8 +37,7 @@ const Navbar = () => {
                                 <Icons.icon className="w-auto h-5" />
                                 <span className="hidden sm:block">Crisp Interview</span>
                             </Link>
-                            <div className="items-center hidden ml-4 lg:flex">
-                            </div>
+                            {/* No menu items needed - simplified */}
                         </div>
                         <div className="items-center flex gap-2 lg:gap-4">
                             <Button size="sm" asChild className="hidden sm:flex bg-black text-white hover:bg-gray-800">

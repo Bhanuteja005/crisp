@@ -1,10 +1,10 @@
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/ui/accordion";
 import { cn } from "../../functions/cn";
 import { useClickOutside } from "../../hooks/use-click-outside";
 import { motion } from "framer-motion";
-import { Box, CalendarClock, Captions, CircleHelp, CopyCheck, FileText, Gem, Layers3, LineChart, Newspaper, UserCog, Waypoints } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import React from 'react';
+import { Button } from "../ui/button";
 
 interface Props {
     isOpen: boolean;
@@ -37,117 +37,23 @@ const MobileMenu = ({ isOpen, setIsOpen }: Props) => {
                     bounce: 0.15,
                     duration: 0.5,
                 }}
-                className="size-full flex flex-col justify-start"
+                className="size-full flex flex-col justify-center items-center"
             >
-                <ul className="flex flex-col items-start flex-1 w-full space-y-3">
-                    <li
+                <div className="text-center space-y-6">
+                    <h2 className="text-2xl font-bold text-black">Ready to Start?</h2>
+                    <p className="text-gray-600 text-lg">Begin your AI-powered interview experience</p>
+                    <Button 
                         onClick={() => setIsOpen(false)}
-                        className="w-full px-4 py-2 text-lg hover:text-muted-foreground font-normal transition transform rounded-md cursor-pointer text-black text-start active:scale-95 hover:bg-muted/20 active:opacity-80"
+                        size="lg" 
+                        asChild 
+                        className="bg-black text-white hover:bg-gray-800 px-8 py-4 text-lg"
                     >
-                        <Link to="#features" className="flex items-center w-full text-start">
-                            <UserCog className="w-4 h-4 mr-2" />
-                            How it works
+                        <Link to="/interview" className="flex items-center gap-3">
+                            Get Started
+                            <ArrowRightIcon className="w-5 h-5" />
                         </Link>
-                    </li>
-                    <Accordion type="single" collapsible className="w-full">
-                        <AccordionItem value="item-1" className="border-transparent">
-                            <AccordionTrigger className="px-4 py-2 text-lg hover:text-muted-foreground font-normal">
-                                <span className="flex items-center">
-                                    <CopyCheck className="w-4 h-4 mr-2" />
-                                    Features
-                                </span>
-                            </AccordionTrigger>
-                            <AccordionContent onClick={() => setIsOpen(false)} className="flex flex-col items-start gap-1 mt-1">
-                                <li
-                                    className="w-full px-4 py-2 text-lg font-normal transition transform rounded-md cursor-pointer text-black hover:text-muted-foreground text-start active:scale-95 hover:bg-muted/20 active:opacity-80"
-                                >
-                                    <Link to="/interview" className="flex items-center w-full text-start">
-                                        <Captions className="w-4 h-4 mr-2" />
-                                        AI Questions
-                                    </Link>
-                                </li>
-                                <li
-                                    className="w-full px-4 py-2 text-lg font-normal transition transform rounded-md cursor-pointer text-black hover:text-muted-foreground text-start active:scale-95 hover:bg-muted/20 active:opacity-80"
-                                >
-                                    <Link to="/interview" className="flex items-center w-full text-start">
-                                        <CalendarClock className="w-4 h-4 mr-2" />
-                                        Timed Interviews
-                                    </Link>
-                                </li>
-                                <li
-                                    className="w-full px-4 py-2 text-lg font-normal transition transform rounded-md cursor-pointer text-black hover:text-muted-foreground text-start active:scale-95 hover:bg-muted/20 active:opacity-80"
-                                >
-                                    <Link to="/interview" className="flex items-center w-full text-start">
-                                        <LineChart className="w-4 h-4 mr-2" />
-                                        Analytics Dashboard
-                                    </Link>
-                                </li>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
-                    <li
-                        onClick={() => setIsOpen(false)}
-                        className="w-full px-4 py-2 text-lg hover:text-muted-foreground font-normal transition transform rounded-md cursor-pointer text-black text-start active:scale-95 hover:bg-muted/20 active:opacity-80"
-                    >
-                        <Link to="#features" className="flex items-center w-full text-start">
-                            <Gem className="w-4 h-4 mr-2" />
-                            Features
-                        </Link>
-                    </li>
-                    <li
-                        onClick={() => setIsOpen(false)}
-                        className="w-full px-4 py-2 text-lg hover:text-muted-foreground font-normal transition transform rounded-md cursor-pointer text-black text-start active:scale-95 hover:bg-muted/20 active:opacity-80"
-                    >
-                        <Link to="/interview" className="flex items-center w-full text-start">
-                            <Waypoints className="w-4 h-4 mr-2" />
-                            Start Interview
-                        </Link>
-                    </li>
-                    <Accordion type="single" collapsible className="w-full">
-                        <AccordionItem value="item-1" className="border-transparent">
-                            <AccordionTrigger className="px-4 py-2 text-lg hover:text-muted-foreground font-normal">
-                                <span className="flex items-center">
-                                    <Layers3 className="w-4 h-4 mr-2" />
-                                    Resources
-                                </span>
-                            </AccordionTrigger>
-                            <AccordionContent onClick={() => setIsOpen(false)} className="flex flex-col items-start gap-1 mt-1">
-                                <li
-                                    className="w-full px-4 py-2 text-lg font-normal transition transform rounded-md cursor-pointer text-black hover:text-muted-foreground text-start active:scale-95 hover:bg-muted/20 active:opacity-80"
-                                >
-                                    <Link to="#features" className="flex items-center w-full text-start">
-                                        <Newspaper className="w-4 h-4 mr-2" />
-                                        Features
-                                    </Link>
-                                </li>
-                                <li
-                                    className="w-full px-4 py-2 text-lg font-normal transition transform rounded-md cursor-pointer text-black hover:text-muted-foreground text-start active:scale-95 hover:bg-muted/20 active:opacity-80"
-                                >
-                                    <Link to="/interview" className="flex items-center w-full text-start">
-                                        <FileText className="w-4 h-4 mr-2" />
-                                        Resume Upload
-                                    </Link>
-                                </li>
-                                <li
-                                    className="w-full px-4 py-2 text-lg font-normal transition transform rounded-md cursor-pointer text-black hover:text-muted-foreground text-start active:scale-95 hover:bg-muted/20 active:opacity-80"
-                                >
-                                    <Link to="/interview" className="flex items-center w-full text-start">
-                                        <Box className="w-4 h-4 mr-2" />
-                                        AI Tools
-                                    </Link>
-                                </li>
-                                <li
-                                    className="w-full px-4 py-2 text-lg font-normal transition transform rounded-md cursor-pointer text-black hover:text-muted-foreground text-start active:scale-95 hover:bg-muted/20 active:opacity-80"
-                                >
-                                    <Link to="#features" className="flex items-center w-full text-start">
-                                        <CircleHelp className="w-4 h-4 mr-2" />
-                                        How it Works
-                                    </Link>
-                                </li>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
-                </ul>
+                    </Button>
+                </div>
             </motion.div>
         </div>
     )
