@@ -1,0 +1,93 @@
+/* Custom components styles */
+.interview-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f9ff 0%, rgba(238, 242, 255, 0.3) 50%, #faf5ff 100%);
+  background-image: 
+    radial-gradient(at 20% 80%, hsla(217, 100%, 95%, 0.3) 0px, transparent 50%),
+    radial-gradient(at 80% 20%, hsla(268, 100%, 95%, 0.3) 0px, transparent 50%),
+    radial-gradient(at 40% 40%, hsla(200, 100%, 98%, 0.4) 0px, transparent 50%);
+}
+
+.glass-effect {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.gradient-text {
+  background: linear-gradient(to right, #2563eb, #9333ea);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.shadow-glow {
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.15);
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: hsl(var(--background));
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--muted));
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--secondary));
+}
+
+/* Animation classes */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tab styles */
+.tab-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 0.125rem;
+  background: linear-gradient(to right, #3b82f6, #a855f7);
+  transition: all 0.3s ease;
+}
+
+/* Loading states */
+.skeleton {
+  background: linear-gradient(to right, #e5e7eb, #d1d5db, #e5e7eb);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
