@@ -93,16 +93,21 @@ const interviewSlice = createSlice({
   initialState,
   reducers: {
     startNewInterview: (state, action: PayloadAction<{ name?: string; email?: string; phone?: string }>) => {
-      const { name = '', email = '', phone = '' } = action.payload;
+      const { name, email, phone } = action.payload;
       
       // If we have a current candidate, preserve their existing data if the new data is empty
       const existingCandidate = state.currentCandidate;
       
+      // Use passed values if provided, otherwise preserve existing values
+      const finalName = name !== undefined ? name : (existingCandidate?.name || '');
+      const finalEmail = email !== undefined ? email : (existingCandidate?.email || '');
+      const finalPhone = phone !== undefined ? phone : (existingCandidate?.phone || '');
+      
       state.currentCandidate = {
         id: existingCandidate?.id || `candidate_${Date.now()}`,
-        name: name || existingCandidate?.name || '',
-        email: email || existingCandidate?.email || '',
-        phone: phone || existingCandidate?.phone || '',
+        name: finalName,
+        email: finalEmail,
+        phone: finalPhone,
         createdAt: existingCandidate?.createdAt || new Date().toISOString(),
         progress: 'not_started',
         questions: [],
@@ -112,9 +117,9 @@ const interviewSlice = createSlice({
       
       // Check for missing fields immediately
       const missing = [];
-      if (!state.currentCandidate.name || state.currentCandidate.name.trim() === '') missing.push('name');
-      if (!state.currentCandidate.email || state.currentCandidate.email.trim() === '') missing.push('email');
-      if (!state.currentCandidate.phone || state.currentCandidate.phone.trim() === '') missing.push('phone');
+      if (!finalName || finalName.trim() === '') missing.push('name');
+      if (!finalEmail || finalEmail.trim() === '') missing.push('email');
+      if (!finalPhone || finalPhone.trim() === '') missing.push('phone');
       
       state.missingFields = missing;
       
@@ -295,8 +300,23 @@ const interviewSlice = createSlice({
       }
     },
 
-    clearCurrentInterview: () => {
-      return initialState;
+    clearCurrentInterview: (state) => {
+      // Preserve resume data when clearing interview
+      const preservedResumeData = state.currentCandidate?.resumeData;
+      const preservedName = state.currentCandidate?.name;
+      const preservedEmail = state.currentCandidate?.email;
+      const preservedPhone = state.currentCandidate?.phone;
+      
+      return {
+        ...initialState,
+        currentCandidate: preservedName || preservedEmail || preservedPhone || preservedResumeData ? {
+          ...initialState.currentCandidate!,
+          name: preservedName || '',
+          email: preservedEmail || '',
+          phone: preservedPhone || '',
+          resumeData: preservedResumeData,
+        } : null,
+      };
     },
   },
   extraReducers: (builder) => {

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { store, persistor } from './app/store';
 import { LandingPage } from './components/LandingPage';
 import { InterviewLayout } from './components/InterviewLayout';
@@ -14,6 +14,7 @@ import './App.css';
 
 const AppContent: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const showWelcomeModal = useAppSelector((state: any) => state.ui.showWelcomeModal);
   const currentCandidate = useAppSelector((state: any) => state.interview.currentCandidate);
 
@@ -32,21 +33,21 @@ const AppContent: React.FC = () => {
   const handleResumeInterview = () => {
     dispatch(resumeInterview());
     dispatch(setShowWelcomeModal(false));
+    navigate('/interview');
   };
 
   const handleStartNewInterview = () => {
     dispatch(clearCurrentInterview());
     dispatch(setShowWelcomeModal(false));
+    navigate('/interview');
   };
 
   return (
     <div className="app-container">
-      <Router>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/interview" element={<InterviewLayout />} />
-        </Routes>
-      </Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/interview" element={<InterviewLayout />} />
+      </Routes>
 
       <WelcomeBackModal
         isOpen={showWelcomeModal}
@@ -81,7 +82,9 @@ const App: React.FC = () => {
         }
         persistor={persistor}
       >
-        <AppContent />
+        <Router>
+          <AppContent />
+        </Router>
       </PersistGate>
     </Provider>
   );

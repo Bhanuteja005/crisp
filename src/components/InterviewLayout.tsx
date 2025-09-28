@@ -133,7 +133,8 @@ export const InterviewLayout: React.FC = () => {
   const handleStartNewFromModal = () => {
     dispatch(clearCurrentInterview());
     setShowWelcomeBack(false);
-    dispatch(startNewInterview({ name: '', email: '', phone: '' }));
+    // Don't pass empty strings - let the reducer check for existing data
+    dispatch(startNewInterview({}));
     setHasStartedInterview(false);
   };
 
